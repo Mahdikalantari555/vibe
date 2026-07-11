@@ -1,14 +1,14 @@
 ---
 title: "Feature: Save and Load"
-status: in-review
+status: deferred-v2
 parent: ../spec.md
 ---
 
 # Save and Load
 
-> **Status: OPTIONAL for V1 (OQ-5).** Offline persistence may be omitted in V1
-> for a faster first playable. If omitted, the game starts fresh each session
-> and the criteria below do not apply until the feature is included.
+> **Status: DEFERRED to V2 (OQ-5 resolved).** Offline persistence is not in V1.
+> V1 starts fresh each session. The criteria below apply when this feature is
+> built in Version 2.
 
 ## Purpose
 
