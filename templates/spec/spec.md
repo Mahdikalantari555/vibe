@@ -1,75 +1,81 @@
 ---
 title: ""
 date: ""
-status: draft
+status: in-review
 source_idea: ""   # path to the idea folder this grew from, e.g. ideas/<project>/
 ---
 
-# 
+# <Project> — Product Specification
 
-## Purpose
+The product/overview contract. It states the *what* and *why*. Each behavioral
+area lives in its own feature spec under `features/` with binary, testable
+acceptance criteria. Code is built against those feature specs, not this prose.
 
-What is this project, in one or two sentences, and why does it exist?
+## Purpose (why)
 
-## Questions this spec answers
-
-List the practical questions this document is meant to answer.
+One or two sentences on what this is and why it should exist.
 
 ## Audience
 
-Who benefits, and what do they care about? (Link to the idea's application.md.)
+Who benefits and what they care about. (Link to the idea's application.md.)
 
 ## Goals
 
-What does success look like? What must this accomplish?
+- G1: …
+- G2: … (make them measurable where possible)
 
-## Non-goals
+## Non-goals (Version 1)
 
-What is explicitly out of scope? What we will not try to do (e.g. for v1).
+What is explicitly out of scope.
 
 ## Core loop
 
-The moment-to-moment experience. What is the player/user actually doing most
-of the time, and how does progress persist between sessions?
+The moment-to-moment experience and how progress persists between sessions.
 
-## Systems
+## Platform & tech approach
 
-Break the design into coherent areas. For each: what it does, its
-responsibilities, and what makes it feel alive or useful.
+Stack, deploy target, tooling, offline story. Pin versions when known.
 
-- ### <System name>
-  What it is and what it owns.
+## Constraints (three-tier)
 
-## How it works (flows)
+- ✅ Always: …
+- ⚠️ Ask first: …
+- 🚫 Never: …
 
-Describe the important behaviors step by step: trigger, participants, steps,
-state changes, success, failure.
+## Assumptions (risk-tagged)
 
-- ### <Flow name>
-  Trigger, steps, state changes, invariants.
+- A1 (Medium): … *If false, …*
+- A2 (Low): …
 
-## Platform and deployment approach
+## Acceptance criteria (whole-product, binary)
 
-The shape of the solution in plain terms. No code — just how it is built and
-shipped (e.g. web first, wrapped later).
+- AC-1: Given …, When …, Then … (maps to a feature spec)
+- AC-2: …
 
-## Invariants and assumptions
+## Edge cases (cross-cutting)
 
-Rules that must remain true. Mark uncertainty explicitly; do not guess.
+- E1: …
+- E2: …
 
-## Open questions
+## Open questions (unresolved — human decides)
 
-What still needs deciding before or during build?
+- OQ-1 (highest risk): …
 
-## Milestones
+## Feature specs
 
-Rough stepping stones from idea to something real, smallest useful thing first.
+- [features/<feature>.md](features/<feature>.md)
 
 ## Source map
 
-Relative Markdown links to the source idea folder, and later to the key
-source files that implement this spec.
+Grew from: [ideas/<project>/](../ideas/<project>/). Link key source files here
+once implementation begins.
 
 ## Related docs
 
-Links to related idea, spec, or other documentation.
+- Source idea: [ideas/<project>/](../ideas/<project>/)
+
+## Status & approval
+
+Status: **in-review**. Do not implement until the human approves this overview
+and the linked feature specs. Update the relevant section first when a decision
+changes.

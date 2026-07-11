@@ -1,195 +1,135 @@
 ---
-title: "Lone Ant — a single-ant colony survival game"
+title: "Lone Ant — Product Specification"
 date: 2026-07-11
-status: draft
+status: in-review
 source_idea: ideas/lone-ant/
 ---
 
-# Lone Ant
+# Lone Ant — Product Specification
 
-## Purpose
+This is the product/overview contract. It states the *what* and *why*. Each
+behavioral area is broken into its own feature spec under
+[features/](features/) with binary, testable acceptance criteria. Code is
+built against those feature specs, not against this prose.
 
-A small, finishable Android/web game where you **live as one ant** in a colony
+## Purpose (why)
+
+A small, finishable web/Android game where you **live as one ant** in a colony
 that keeps living and growing around you. The player controls a single ant,
-forages and carries food back to the nest, and watches automatic worker ants
-keep the colony alive. Progress saves on the device so the world resumes
-exactly where you left it. The goal is a cozy, low-pressure "tiny living world"
-that a hobbyist can actually ship with AI agents building most of it, developed
+forages and carries food home, and watches automatic worker ants keep the
+colony alive. Progress saves on the device so the world resumes exactly where
+left off. The point is a cozy, low-pressure "tiny living world" that a
+hobbyist can actually ship with AI agents doing most of the build, developed
 from a phone with a fast test loop.
-
-## Questions this spec answers
-
-- What is the player actually doing moment to moment? (Forage & carry.)
-- What systems make the colony feel alive? (Worker ants, pheromones, nest storage.)
-- What is the threat and how often does it show up? (Spiders, tuned for tension not stress.)
-- How does progress persist between sessions? (Save on close, resume on open.)
-- What platform and build path gives the fastest finish? (Web first via Phaser, APK later via Capacitor.)
-- What is explicitly out of scope for Version 1? (See [Non-goals](#non-goals).)
 
 ## Audience
 
 Hobby game tinkerers — people who enjoy poking at games and game-making more
-than being a passive user. They want:
-
-- A world that feels alive and continues without them.
-- Something they can actually finish and show a friend, not a half-built dream.
-- A short, low-pressure loop they return to across days.
-
-They are fine with simple graphics and simple sound. What they want is the
-*feeling* of being one small ant in a bigger living thing. See
-[ideas/lone-ant/application.md](../ideas/lone-ant/application.md) for the
-full human framing.
+than being a passive user. They want a world that feels alive, something they
+can finish and show a friend, and a short loop they return to across days.
+Simple graphics/sound are fine; the feeling of being one small ant in a bigger
+living thing is what matters. See [ideas/lone-ant/application.md](../../ideas/lone-ant/application.md).
 
 ## Goals
 
-- Controllable single ant whose main activity is foraging and carrying food home.
-- A colony that visibly grows and stores food because of what ants (player + workers) do.
-- Progress saved on the device: closing and reopening resumes exactly where left off (colony size, stored food, unlocks).
-- Runs in a web browser with no install; can later be wrapped as an Android APK for the home screen.
-- Built mostly by AI agents, from a phone, with a fast build-and-test loop.
+- G1: Controllable single ant whose main activity is foraging and carrying food home.
+- G2: A colony that visibly grows and stores food because of what ants (player + workers) do.
+- G3: Progress saved on the device; closing and reopening resumes exactly where left off.
+- G4: Runs in a web browser with no install; later wrappable as an Android APK.
+- G5: Buildable mostly by AI agents, from a phone, with a fast build-and-test loop.
 
-## Non-goals
-
-Out of scope for Version 1:
+## Non-goals (Version 1)
 
 - Multiplayer, accounts, or any server.
-- Real-time simulation while the game is closed (the world is *saved*, not *running*, while away).
-- Rival colonies, genetics, seasons, larvae, queens, procedural worlds, or multiple insect species.
+- Real-time simulation while the game is closed (the world is *saved*, not *running*).
+- Rival colonies, genetics, seasons, larvae, queens, procedural worlds, multiple insect species.
 - Polished art or music; simple shapes and simple sound are acceptable.
 - A native-only build path requiring Android Studio up front.
 
-These belong to later versions if the core proves fun (see [Milestones](#milestones)).
-
 ## Core loop
 
-The player's normal session is **forage & carry**:
+The player's normal session is **forage & carry**: steer the ant → find food →
+pick it up → carry it back along (or laying) a pheromone trail → drop it in the
+nest → storage increases → repeat. Worker ants do the same in the background.
+Persistence is **save-my-progress**: on return, colony size, stored food, and
+unlocks are as left; the world does not advance on its own.
 
-1. Steer the ant through the world (tap/drag or on-screen controls on phone).
-2. Find a food item and pick it up.
-3. Carry it back along (or laying) a pheromone trail to the nest entrance.
-4. Drop it into storage; the colony stock increases.
-5. Repeat. Worker ants do the same in the background, so the world feels busy.
+## Platform & tech approach
 
-Persistence is **save-my-progress**, not a living simulation while away: when
-you return, the colony size, stored food, and unlocks are as you left them.
-The world does not advance on its own in the meantime.
+- **Stack:** Browser game, Phaser 3 + TypeScript. (Exact versions pinned when implementation starts — see [features/web-deploy.md](features/web-deploy.md).)
+- **Deploy:** Web first (hosted, opens from a link, playable on a phone). Later wrapped as an Android APK with Capacitor.
+- **Tooling:** Kilo Code edits the project; push to GitHub; GitHub Pages updates; open URL on phone to test; repeat.
+- **Offline:** No server, no account. Save state lives on the device.
 
-## Systems
+## Constraints (three-tier)
 
-### Controllable ant
+- ✅ Always: keep the player controllable as exactly one ant; keep all food/storage logic in shared colony state; save before the page unloads.
+- ⚠️ Ask first: changing the core fun loop (e.g. adding defense/steering jobs before Version 2); adding a new dependency; changing the save schema.
+- 🚫 Never: require a network connection or account to play or save; simulate the world while the game is closed; add features listed in Non-goals; delete or weaken tests to make them pass.
 
-- One ant the player steers. Its responsibilities: move, pick up food, carry food, drop food at nest.
-- Movement is top-down on a 2D map. Controls must work on a touchscreen phone.
+## Assumptions (risk-tagged)
 
-### Worker ants
+- A1 (Medium): "Forage & carry" stays fun past a few sessions without an extra job. *If false, add one job in V1.*
+- A2 (Medium): Stored food as the sole growth signal is enough reward. *If false, add a player-ant unlock.*
+- A3 (Low): On-device web storage (localStorage/IndexedDB) is sufficient and persists between sessions on the target phones.
+- A4 (Low): Phaser can render hundreds of ants at acceptable frame rate on mid-range Android. *If false, cap worker count / use spatial culling.*
 
-- Automatic ants the player does not control.
-- They follow pheromone trails and gather food on their own, giving the world a sense of life even when the player only watches.
-- Their gathering contributes to the same colony storage as the player's.
+## Acceptance criteria (Version 1, whole-product)
 
-### Pheromone trails
+These are the binary, checkable conditions for "V1 is done." Each maps to a
+feature spec.
 
-- Ants leave scent paths between food and the nest.
-- Trails guide movement so "where do I go" feels organic rather than menu-driven.
-- Player trails and worker trails both persist on the map during a session.
+- AC-1: Given the game loads, When the player steers, Then exactly one ant responds and moves on the 2D map (controllable-ant).
+- AC-2: Given the player ant touches a food item, When the pickup input fires, Then the ant carries it and storage increases on drop at the nest (foraging).
+- AC-3: Given the game runs, When workers exist, Then they follow pheromone trails and deliver food to storage without player input (worker-ants-and-pheromones).
+- AC-4: Given storage crosses a threshold, When the colony updates, Then worker count and/or nest size increases and is visible (nest-and-storage).
+- AC-5: Given a spider is present, When it contacts an ant, Then the ant is removed/returned and (if carrying) drops food (spiders).
+- AC-6: Given the player closes the game, When it reopens, Then colony size, stored food, and unlocks match the pre-close state exactly (save-and-load).
+- AC-7: Given the deployed URL, When opened on a phone browser, Then the game is playable with no install (web-deploy).
 
-### Nest and storage
+## Edge cases (cross-cutting)
 
-- Food delivered by the player and workers fills a colony stock.
-- In Version 1, "growth" means: more stored food lets the colony support more workers and a bigger visible nest.
-- Storage is the concrete feedback that the player's actions matter.
+- E1: Player ant dies/caught → respawns at nest; control is never lost.
+- E2: No food on map → workers idle, no crash, storage unchanged.
+- E3: Storage at zero → no negative values, no divide-by-zero in growth math.
+- E4: Save corrupted or absent → start a fresh colony, do not crash.
+- E5: Page closed mid-carry → on reopen, food is at nest or back in world, never duplicated.
 
-### Spiders (threat)
+## Open questions (unresolved — human decides)
 
-- One or two spiders roam and can catch ants.
-- Tension is real but simple: avoid being caught, and avoid leading danger home.
-- Frequency is a balance question (see [Open questions](#open-questions)).
+- OQ-1 (highest risk): **The fun loop itself.** Coding is solvable; game design is not. Does forage-and-carry stay engaging, and what is the "why come back tomorrow"? This must be validated by playtesting, not assumed.
+- OQ-2: Concrete reward for storing food (more workers / bigger nest / new player ability)?
+- OQ-3: Spider frequency for tension without constant stress?
+- OQ-4: Confirm web-first (Phaser) + Capacitor APK tooling.
+- OQ-5: Does on-device web storage meet offline-persistence needs, or is the app wrapper required?
 
-### Day/night cycle
+## Feature specs
 
-- A visual cycle that changes light and mood.
-- In Version 1 it is mostly atmosphere, not a hard mechanic.
-
-### Save and load
-
-- On close: store colony size, stored food, unlocks, and world layout on the device.
-- On open: restore exactly that state. No server, no account.
-- The world is paused, not simulated, while the game is closed.
-
-## How the game works (flows)
-
-### Foraging flow
-
-- Trigger: player steers ant onto a food item.
-- Steps: pick up → follow/leave trail → reach nest → drop into storage.
-- State change: colony storage increases; pheromone trail strengthens.
-- Success: food counted in storage. Failure: ant caught by spider (drops food, returns to nest).
-
-### Colony growth flow
-
-- Trigger: storage crosses a threshold.
-- Steps: colony supports additional worker(s) and/or nest size increases.
-- State change: more workers gather automatically; nest visually larger.
-- This is the main long-term reward in Version 1.
-
-### Session resume flow
-
-- Trigger: player opens the game.
-- Steps: load saved state from device storage → rebuild world from saved layout → place player ant at nest.
-- Invariant: reopened state must match saved state exactly (no silent drift).
-
-## Platform and deployment approach
-
-- **Web first.** Build as a browser game (Phaser + TypeScript). Opens from a link, so it is testable on a phone instantly with no app store.
-- **Phone later.** Wrap the same web game as an installable Android APK with Capacitor for home-screen install.
-- This keeps the build-and-test loop fast, which is what lets a phone-only, agent-built project finish.
-- The human owns game design (fun loop, balance, "why come back"); AI agents are the implementation team.
-
-## Invariants and assumptions
-
-- The player always controls exactly one ant.
-- Stored food never decreases except by defined rules (no silent loss).
-- Saved state on reopen must equal saved state on close.
-- The world does not simulate while closed.
-- No network, accounts, or servers are required to play or save.
-- Worker ants share the same colony storage as the player.
-
-## Open questions
-
-- Does "forage and carry" stay fun past a few sessions, or is one extra job (defend, steer workers, choose dig spots) needed sooner than Version 2?
-- What is the concrete reward for storing food — more workers, a bigger nest, or a new ability for the player ant?
-- How often should a spider appear to be a real threat without constant stress?
-- Confirm tooling: web-first via Phaser, APK via Capacitor.
-- Does the colony save cleanly as a plain web page using on-device storage, or does offline persistence need the app wrapper?
-
-## Milestones
-
-Smallest useful thing first:
-
-1. **Walking ant** — one ant moves on a small map with simple controls.
-2. **Food + carry** — pick up food, carry to nest, watch storage increase.
-3. **Worker ants + pheromones** — automatic ants follow trails and gather.
-4. **Small nest + storage** — stored food visibly grows the colony.
-5. **Spiders** — one roaming enemy that can catch ants; basic avoidance.
-6. **Save/load** — progress persists on the device between sessions.
-7. **Web deploy** — hosted so it opens from a link and plays on a phone.
-8. **Polish** — day/night look, simple sound, basic balance pass.
-9. **Android APK (optional)** — wrap with Capacitor for home-screen install.
-
-Version 2 (later): larvae, queen, colony expansion, seasons, more insect species.
-Version 3: rival colonies, procedural world, deeper ecosystem.
+- [features/controllable-ant.md](features/controllable-ant.md)
+- [features/foraging.md](features/foraging.md)
+- [features/worker-ants-and-pheromones.md](features/worker-ants-and-pheromones.md)
+- [features/nest-and-storage.md](features/nest-and-storage.md)
+- [features/spiders.md](features/spiders.md)
+- [features/save-and-load.md](features/save-and-load.md)
+- [features/web-deploy.md](features/web-deploy.md)
 
 ## Source map
 
-This spec grew from the idea folder:
+Grew from:
 
-- [ideas/lone-ant/concept.md](../ideas/lone-ant/concept.md) — the plain-language spark.
-- [ideas/lone-ant/application.md](../ideas/lone-ant/application.md) — who it's for and where it lives.
-- [ideas/lone-ant/questions.md](../ideas/lone-ant/questions.md) — earlier doubts and the web-first tooling note.
+- [ideas/lone-ant/concept.md](../../ideas/lone-ant/concept.md)
+- [ideas/lone-ant/application.md](../../ideas/lone-ant/application.md)
+- [ideas/lone-ant/questions.md](../../ideas/lone-ant/questions.md)
 
-When implementation begins, link the most important source files here (e.g. the ant controller, pheromone system, storage, save/load modules).
+When implementation begins, link the key source files here (ant controller, pheromone system, storage, save/load, spider AI, deploy config).
 
 ## Related docs
 
-- Source idea: [ideas/lone-ant/](../ideas/lone-ant/)
-- Forge workflow: see `README.md` and the `/new-idea`, `/new-spec`, `/archive` commands.
+- Source idea: [ideas/lone-ant/](../../ideas/lone-ant/)
+- Forge workflow: `README.md`, and the `/new-idea`, `/new-spec`, `/archive` commands.
+
+## Status & approval
+
+Status: **in-review**. Do not start implementation until the human has approved
+this overview and the linked feature specs, especially OQ-1 (the fun loop).
+When a decision changes, update the relevant section *first*, then implement.
