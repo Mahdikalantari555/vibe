@@ -26,7 +26,13 @@ instead of flattening out. Balancing the simulation and designing a game worth
 finishing is the hard part, and that is the human's job, not the agent's.
 
 There is also an open tooling question worth flagging (technical, for later):
-build it as a browser game first with Phaser + TypeScript and wrap it as an
-APK with Capacitor (fast loop, no Android Studio, test on the phone via a
-shared web link), or go straight to a native phone framework. The Phaser path
-looks like the faster way to actually finish from a phone.
+build it as a browser game first with Phaser + TypeScript and put it on the
+web (sharable link, instant testing from a phone, no app store), then wrap the
+same game as an installable Android app (APK) with Capacitor when we want it
+on a home screen. This "web first, phone later" path looks like the faster way
+to actually finish from a phone. The main thing to confirm: does the colony
+still save and persist offline when played as a plain web page (it should,
+using storage on the device), or does that need the app wrapper?
+
+- Should the web version be the primary way people play, with the APK as a nice
+  extra — or is the phone app the real goal and the web just a dev convenience?

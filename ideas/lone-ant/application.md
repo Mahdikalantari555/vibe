@@ -20,9 +20,16 @@ watching "your" colony grow and imagining how a friend's turned out.
 
 ## Where would it live?
 
-On an Android phone, offline, with no setup. You open it on a commute or
-while winding down, do a little, and put it away. No emulator, no studio, no
-fuss — the whole thing is meant to be built and played from the phone itself.
+On the web first, then on an Android phone. Because the game is built as a
+browser game, it can be opened from any link and played right there — no
+install, no app store, no setup. That makes it easy to share with friends and
+to test on a phone just by opening a URL. "Offline" still matters: the colony
+saves on the device, so you don't need a server or an account to keep playing.
+
+Later, the same web game can be wrapped into an installable Android app (an
+APK) for people who want it on their home screen like a normal app. So the
+web version is the fast path to something playable, and the phone app is a
+polish step afterward.
 
 ## Why does it matter?
 
