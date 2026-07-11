@@ -31,13 +31,12 @@ that relocates the files within the `vibe` repo, so nothing is deleted.
    Rewrite the internal links to the flat names (see Link rewriting). Commit and
    push the game repo. This `.specs/` folder is the agent-readable contract the
    coding agent uses to build the game. **Do not modify the vibe repo in this step.**
-5. **Archive in vibe (separate, optional step):** only when you decide the project
-   is built or retired, relocate it within the vibe repo so the workspace stays
-   clean:
-   - `git mv ideas/<project> archive/<project>/ideas/<project>`
-   - `git mv specs/<project> archive/<project>/specs/<project>`
-   Commit and push vibe. This moves files inside the vibe repo; nothing is
-   deleted from vibe. (Equivalent to the `/archive` command.)
+5. **Archive in vibe (separate, optional step):** when you decide the project is
+   built or retired, archive it with the `/archive` command. That moves
+   `ideas/<project>/` → `archive/<project>/ideas/` and
+   `specs/<project>/` → `archive/<project>/specs/` (the project name appears
+   once, as the `archive/<project>` parent). Publish itself never touches vibe;
+   `/archive` does the relocation, and the files stay in the vibe repo.
 6. Report where the contract lives (`<game-repo>/.specs/...`) and, if archived,
    where it moved (`vibe/archive/<project>/...`).
 
