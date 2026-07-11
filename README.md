@@ -50,6 +50,7 @@ These Kilo commands drive the workflow:
 - `/new-idea` — interview you (plain, non-technical) and create
   `ideas/<project-name>/` with multiple markdown files.
 - `/new-spec` — read an idea folder and write `specs/<project-name>/spec.md`.
+- `/publish` — copy a project's `ideas/` and `specs/` into a new game repo under `.specs/`, then archive the originals in `vibe`.
 - `/archive` — move an idea or spec folder into `archive/<project-name>/`.
 
 On a fresh clone, run `/init` (built-in) to generate `AGENTS.md`, then the
