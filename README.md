@@ -13,20 +13,27 @@ sharpen them into concepts, and cool them into written specs ready to be built.
 
 ## How it's organized
 
+Everything is grouped by **project**. Each idea, spec, and archived project
+lives in its own folder, named with a lowercase, hyphenated slug:
+
 ```
-ideas/      # Raw, unpolished thoughts. Anything goes. One file per idea.
-specs/      # Refined specifications derived from ideas. Ready to hand to a builder.
-archive/    # Dead, deferred, or superseded ideas and specs.
+ideas/<project-name>/     # Raw, unpolished thoughts. One folder per idea.
+specs/<project-name>/     # A refined specification. One folder per project.
+archive/<project-name>/   # Dead, deferred, or superseded projects.
 ```
 
 ### Ideas
 
-Loose and low-pressure. An idea can be a sentence or a paragraph. The goal is
-volume and honesty, not polish. Use `ideas/YYYY-MM-DD-<slug>.md`.
+Captured through a friendly, non-technical interview. A new idea folder holds
+several markdown files exploring the idea from different angles, e.g.:
+
+- `concept.md` — the idea in plain language.
+- `application.md` — what it's for, who it's for, why it matters.
+- `questions.md` — what's still uncertain.
 
 ### Specs
 
-Specifications are the output of this forge. A good spec answers:
+A specification is the output of this forge. A good spec answers:
 
 - **Problem** — what is wrong or missing?
 - **Users** — who cares, and why?
@@ -36,20 +43,31 @@ Specifications are the output of this forge. A good spec answers:
 - **Open questions** — what we still don't know.
 - **Milestones** — rough stepping stones toward done.
 
-Use `specs/<project-name>.md`.
+## Commands
+
+These Kilo commands drive the workflow:
+
+- `/new-idea` — interview you (plain, non-technical) and create
+  `ideas/<project-name>/` with multiple markdown files.
+- `/new-spec` — read an idea folder and write `specs/<project-name>/spec.md`.
+- `/archive` — move an idea or spec folder into `archive/<project-name>/`.
+
+On a fresh clone, run `/init` (built-in) to generate `AGENTS.md`, then the
+forge `/init` (or `bash scripts/forge-init.sh`) to scaffold the directories
+and templates.
 
 ## Workflow
 
-1. Capture an idea in `ideas/`.
-2. When an idea survives a few days, promote it: turn it into a spec in `specs/`.
+1. Run `/new-idea` to capture a thought in `ideas/<project-name>/`.
+2. When an idea survives, run `/new-spec` to promote it to `specs/<project-name>/`.
 3. Link the source idea from the spec so the trail is visible.
-4. When a spec is built, or abandoned, move it to `archive/`.
+4. When built or abandoned, run `/archive` to move it to `archive/<project-name>/`.
 
 ## Conventions
 
 - Write in Markdown.
-- Name files with dates or clear slugs.
-- Prefer clarity over completeness. A short honest spec beats a long vague one.
+- Use a lowercase, hyphenated slug for every project folder.
+- Prefer clarity over completeness. A short honest entry beats a long vague one.
 
 ---
 
