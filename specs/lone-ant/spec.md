@@ -60,9 +60,10 @@ You want **more world/colony design investment for V1**, not more mechanics.
 Concretely, V1 should make the world *feel* alive and worth looking at: a
 visible, growing nest; ambient activity beyond the player (workers, drifting
 pheromones, small ecosystem motion); a day/night mood cycle; and some
-terrain/visual variety so the map isn't flat. This is captured as its own
-feature spec: [features/world-and-ambiance.md](features/world-and-ambiance.md).
-What "more world" specifically means is still open — see OQ-6.
+terrain/visual variety so the map isn't flat. The chosen direction is a
+**simple but beautiful pixel-art** style — see the full brief in
+[features/world-and-ambiance.md](features/world-and-ambiance.md) (OQ-6
+resolved).
 
 ## Platform & tech approach
 
@@ -112,7 +113,7 @@ feature spec.
 - OQ-3 (RESOLVED): Spiders are rare by default.
 - OQ-4 (RESOLVED): Phaser 3 + TypeScript, web-first, Capacitor APK later.
 - OQ-5 (PARTIAL): Offline save may be **omitted for V1**. The save-and-load feature is optional; decide at plan time whether to include a minimal version or skip it.
-- OQ-6 (open): "More world design" — concretely which elements (terrain variety, ambient non-ant life, nest interior, decor, weather)? Decide in the plan phase; captured in the world-and-ambiance feature spec.
+- OQ-6 (RESOLVED): "More world design" = a **simple but beautiful pixel-art** look with terrain variety (autotiles + foliage), ambient ecosystem motion (grass sway, worker greetings, reusable particles), and a visibly growing nest. Captured in [features/world-and-ambiance.md](features/world-and-ambiance.md) as a concrete style brief (16px grid, 320×576, warm limited palette, nest ring-growth, player/worker cues, violet spider with telegraph, day/night tint, diegetic HUD).
 
 ## Feature specs
 
