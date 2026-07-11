@@ -20,23 +20,25 @@ thinking space stays clean.
    (Visibility is your call; public works for GitHub Pages testing. Private still serves Pages to you when logged in.)
 3. Clone `<game-repo>` to a temp dir (use `gh repo clone` or `gh auth setup-git` + https remote).
 4. **Publish** into the game repo as a FLAT set of files directly under `.specs/`
-   (no `ideas/` or `specs/` or `<project>/` subfolders). Prefix every file with
-   the project slug to avoid collisions when multiple projects are published:
-   - `ideas/<project>/<name>.md` → `.specs/<project>-<name>.md`
-     (e.g. `concept.md` → `lone-ant-concept.md`, `application.md` → `lone-ant-application.md`)
-   - `specs/<project>/spec.md` → `.specs/<project>-spec.md`
-   - `specs/<project>/features/<feat>.md` → `.specs/<project>-feature-<feat>.md`
+   (no `ideas/`, `specs/`, `<project>/` subfolders, and no project-name prefix):
+   - `ideas/<project>/<name>.md` → `.specs/<name>.md`
+     (e.g. `concept.md`, `application.md`, `questions.md`)
+   - `specs/<project>/spec.md` → `.specs/spec.md`
+   - `specs/<project>/features/<feat>.md` → `.specs/feature-<feat>.md`
+     (the `feature-` prefix distinguishes feature specs from idea files)
    - Commit and push. This `.specs/` folder is the agent-readable contract the
      coding agent uses to build the game.
+   Assume one project per game repo; if multiple projects must share a `.specs/`,
+   plain names will collide — keep one project per repo.
 5. **Rewrite internal links** in the published files so they point at the flat
    names (the copies still contain the old nested relative links). For every
    published `.md`, replace:
-   - `features/<feat>.md` → `<project>-feature-<feat>.md`
-   - `../spec.md` → `<project>-spec.md` (including `../spec.md#anchor`)
-   - `../../ideas/<project>/<name>.md` → `<project>-<name>.md`
+   - `features/<feat>.md` → `feature-<feat>.md`
+   - `../spec.md` → `spec.md` (including `../spec.md#anchor`)
+   - `../../ideas/<project>/<name>.md` → `<name>.md`
    Also fix any stale link *text* that still reads `ideas/<project>/...` or
-   points at the removed `features/` folder, and update the `source_idea`
-   front-matter to just `<project>`.
+   points at the removed `features/` folder, and set the `source_idea`
+   front-matter to `.`.
 6. **Archive** in vibe, mirroring the original structure so the archived copy's
    links still resolve:
    - `git mv ideas/<project> archive/<project>/ideas/<project>`
@@ -50,4 +52,7 @@ thinking space stays clean.
 - Treat the published `.specs/` as a copy/handoff — never delete the source before archiving.
 - Keep the contract and code in agreement: if the spec changes during build, re-run publish (or update `.specs/`) and push.
 - Do not write implementation code in this step.
-- `.specs/` MUST be flat (all `.md` directly under `.specs/`, prefixed by project slug). Do not recreate `ideas/`, `specs/`, or `<project>/` subfolders inside it. The archived copy in vibe keeps the original nested layout.
+- `.specs/` MUST be flat (all `.md` directly under `.specs/`, no project-name
+  prefix; feature specs use a `feature-` prefix). Do not recreate `ideas/`,
+  `specs/`, or `<project>/` subfolders inside it. The archived copy in vibe
+  keeps the original nested layout. One project per game repo is assumed.
