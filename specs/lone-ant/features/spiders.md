@@ -9,7 +9,7 @@ parent: ../spec.md
 ## Purpose
 
 A spider provides real but simple tension: avoid being caught, and avoid
-leading danger home. Frequency is a balance question (OQ-3 in [../spec.md](../spec.md)).
+leading danger home. Spiders are **rare by default** (OQ-3 resolved).
 
 ## Requirements
 
@@ -18,6 +18,7 @@ leading danger home. Frequency is a balance question (OQ-3 in [../spec.md](../sp
 - FR-3: When a player or worker ant is caught, it SHALL be removed (or returned to nest) and drop any carried food.
 - FR-4: Spider behavior SHALL be simple and predictable enough to be avoidable.
 - FR-5: Spider count/presence SHALL be configurable (for balancing).
+- FR-6: By default, spiders SHALL be RARE (infrequent spawns), tuned for tension without constant stress.
 
 ## Acceptance Criteria
 

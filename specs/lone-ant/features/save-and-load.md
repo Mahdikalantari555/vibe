@@ -6,6 +6,10 @@ parent: ../spec.md
 
 # Save and Load
 
+> **Status: OPTIONAL for V1 (OQ-5).** Offline persistence may be omitted in V1
+> for a faster first playable. If omitted, the game starts fresh each session
+> and the criteria below do not apply until the feature is included.
+
 ## Purpose
 
 Progress persists on the device so closing and reopening resumes exactly where
