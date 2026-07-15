@@ -6,17 +6,23 @@ interface Env {
 }
 
 const KILO_BASE_URL = "https://api.kilo.ai/api/gateway";
-const KILO_MODEL = "nvidia/nemotron-3-ultra-550b-a55b:free";
+const KILO_MODEL = "kilo-auto/free";
+const KILO_FALLBACK_MODEL = "tencent/hy3:free";
 const SUBS_KEY = "subscribers";
 
-const SYSTEM_PROMPT = `تو یک نویسنده الهام‌بخش هستی که آموزه‌های کوتاه و آرام‌بخش بر پایه اندیشه‌های زرتشتی (با تمرکز بر «پندار نیک، گفتار نیک، کردار نیک») به زبان فارسی می‌نویسی.
+const SYSTEM_PROMPT = `تو یک نویسنده الهام‌بخش فارسی‌زبان هستی که آموزه‌های کوتاه و آرام‌بخش بر پایه اندیشه‌های زرتشتی (با تمرکز بر «پندار نیک، گفتار نیک، کردار نیک») می‌نویسی.
+
+قواعد حتمی و غیرقابل‌تخلف:
+- متن را فقط و فقط به زبان فارسی بنویس. هیچ واژه، حرف، علامت یا نشانه‌ای از هیچ زبان دیگر (انگلیسی، چینی، روسی و غیره) در خروجی نباید باشد. اگر کلمه‌ای در فارسی معادل ندارد، آن را ترجمه یا حذف کن.
+- تمام حروف باید فارسی/عربی باشند؛ از نوشتن کلمات به حروف لاتین (مثل reflect یا vehicle) اکیداً خودداری کن.
+- نام را همیشه به صورت «وُهومن:» (با ضمه روی واو) بنویس، نه «وِهومن».
+- در پایان، متن را دقیقاً با این سطر تمام کن:
+پندار نیک، گفتار نیک، کردار نیک
 
 سبک نوشته:
 - با یک سطر کوتاه و زیبا آغاز کن که گاهی با نمادی مثل ✨ یا 🌙 یا «وُهومن:» شروع شود.
 - یک یا دو پاراگراف کوتاه (مجموعاً حدود ۱۵۰ تا ۳۰۰ کلمه) با لحن شاعرانه، آرام و برانگیزاننده.
 - در صورت مناسب، در میانه یا پایان یک پرسش کوتاه تأملی برای خواننده بیاور.
-- همیشه متن را دقیقاً با این سطر تمام کن:
-پندار نیک، گفتار نیک، کردار نیک
 - از تکرار الگوی یکسان در هر بار پرهیز کن؛ هر بار موضوع یا زاویهٔ تازه‌ای برگزین.
 - فقط متن آموزه را برگردان، بدون هیچ توضیح یا نقل‌قول اضافه.`;
 
@@ -34,34 +40,57 @@ function buildUserPrompt(seed: string): string {
 }
 
 async function generateTeaching(apiKey: string, seed: string): Promise<string> {
-  const res = await fetch(`${KILO_BASE_URL}/chat/completions`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: KILO_MODEL,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: buildUserPrompt(seed) },
-      ],
-      max_tokens: 700,
-      temperature: 0.9,
-    }),
-  });
+  const messages = [
+    { role: "system", content: SYSTEM_PROMPT },
+    { role: "user", content: buildUserPrompt(seed) },
+  ];
+  const models = [KILO_MODEL, KILO_FALLBACK_MODEL];
+  let lastErr: any;
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    const model = models[(attempt - 1) % models.length];
+    try {
+      const res = await fetch(`${KILO_BASE_URL}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          max_tokens: 500,
+          temperature: 0.9,
+          reasoning_effort: "none",
+        }),
+      });
 
-  if (!res.ok) {
-    const t = await res.text();
-    throw new Error(`Kilo Gateway ${res.status}: ${t}`);
+      if (!res.ok) {
+        const t = await res.text();
+        throw new Error(`Kilo Gateway ${res.status}: ${t}`);
+      }
+
+      const data: any = await res.json();
+      const choice = data?.choices?.[0];
+      const content = (choice?.message?.content ?? "").trim();
+      const reasoning = (choice?.message?.reasoning ?? "").trim();
+      const text = content || reasoning;
+      const cleaned = sanitizePersian(text);
+      if (cleaned) return cleaned;
+      throw new Error("empty content");
+    } catch (e) {
+      lastErr = e;
+      await new Promise((r) => setTimeout(r, 800 * attempt));
+    }
   }
+  throw lastErr ?? new Error("generation failed");
+}
 
-  const data: any = await res.json();
-  const choice = data?.choices?.[0];
-  const content = choice?.message?.content ?? "";
-  const reasoning = choice?.message?.reasoning ?? "";
-  const text = (content || reasoning || "").trim();
-  return text || "امشب آرامش را برگزین.";
+function sanitizePersian(text: string): string {
+  return text
+    .replace(/[A-Za-zÀ-ɏЀ-ӿ一-鿿぀-ヿ가-힯]/g, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 async function tg(token: string, method: string, body: any): Promise<any> {
@@ -105,7 +134,13 @@ async function getSubscribers(kv: any): Promise<number[]> {
 }
 
 async function runNightlyBroadcast(env: Env): Promise<void> {
-  const teaching = await generateTeaching(env.KILO_API_KEY, randomSeed() + "-nightly");
+  let teaching: string;
+  try {
+    teaching = await generateTeaching(env.KILO_API_KEY, randomSeed() + "-nightly");
+  } catch (e) {
+    console.error("nightly generation failed", e);
+    teaching = "وُهومن:\nامشب فرصتی است تا پنداری نو بکاری و با نیکی، گامی در راه روشنایی برداری.\n\nپندار نیک، گفتار نیک، کردار نیک";
+  }
 
   if (env.CHANNEL_ID) {
     try {
