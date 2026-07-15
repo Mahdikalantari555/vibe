@@ -6,7 +6,7 @@ interface Env {
 }
 
 const KILO_BASE_URL = "https://api.kilo.ai/api/gateway";
-const KILO_MODEL = "kilocode/kilo/auto";
+const KILO_MODEL = "nvidia/nemotron-3-ultra-550b-a55b:free";
 const SUBS_KEY = "subscribers";
 
 const SYSTEM_PROMPT = `تو یک نویسنده الهام‌بخش هستی که آموزه‌های کوتاه و آرام‌بخش بر پایه اندیشه‌های زرتشتی (با تمرکز بر «پندار نیک، گفتار نیک، کردار نیک») به زبان فارسی می‌نویسی.
@@ -57,8 +57,11 @@ async function generateTeaching(apiKey: string, seed: string): Promise<string> {
   }
 
   const data: any = await res.json();
-  const content = data?.choices?.[0]?.message?.content ?? "";
-  return content.trim() || "امشب آرامش را برگزین.";
+  const choice = data?.choices?.[0];
+  const content = choice?.message?.content ?? "";
+  const reasoning = choice?.message?.reasoning ?? "";
+  const text = (content || reasoning || "").trim();
+  return text || "امشب آرامش را برگزین.";
 }
 
 async function tg(token: string, method: string, body: any): Promise<any> {
@@ -140,15 +143,22 @@ export default {
       return new Response("Bad Request", { status: 400 });
     }
 
+    try {
     const cb = update?.callback_query;
     if (cb) {
       const chatId = cb.message?.chat?.id ?? cb.from?.id;
-      await tg(env.BOT_TOKEN, "answerCallbackQuery", { callback_query_id: cb.id });
+      try {
+        await tg(env.BOT_TOKEN, "answerCallbackQuery", { callback_query_id: cb.id });
+      } catch (e) {
+        console.error("answerCallbackQuery failed", e);
+      }
       try {
         const teaching = await generateTeaching(env.KILO_API_KEY, randomSeed());
         await sendLong(env.BOT_TOKEN, chatId, teaching);
       } catch {
-        await sendLong(env.BOT_TOKEN, chatId, "متاسفم، الان نتونستم آموزه بسازم. دوباره امتحان کن.");
+        try {
+          await sendLong(env.BOT_TOKEN, chatId, "متاسفم، الان نتونستم آموزه بسازم. دوباره امتحان کن.");
+        } catch {}
       }
       return new Response("OK");
     }
@@ -166,15 +176,23 @@ export default {
         "🌿 سلام\nهر شب ساعت ۱۱:۱۱ یک آموزهٔ زرتشتی برایت می‌فرستم. هر وقت خواستی آموزهٔ تازه‌ای ببین، دکمهٔ زیر را بزن.";
       const prompt = "برای دریافت یک آموزهٔ تازه، دکمهٔ زیر را بزن:";
 
-      await tg(env.BOT_TOKEN, "sendMessage", {
-        chat_id: chatId,
-        text: text === "/start" || text === "/help" || text === "" ? welcome : prompt,
-        reply_markup: NEW_TEACHING_MARKUP,
-      });
+      try {
+        await tg(env.BOT_TOKEN, "sendMessage", {
+          chat_id: chatId,
+          text: text === "/start" || text === "/help" || text === "" ? welcome : prompt,
+          reply_markup: NEW_TEACHING_MARKUP,
+        });
+      } catch (e) {
+        console.error("welcome send failed", e);
+      }
       return new Response("OK");
     }
 
     return new Response("OK");
+    } catch (err: any) {
+      console.error("unhandled error", err);
+      return new Response("OK");
+    }
   },
 
   async scheduled(_event: any, env: Env, _ctx: any): Promise<void> {
