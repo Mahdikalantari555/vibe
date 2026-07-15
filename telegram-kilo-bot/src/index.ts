@@ -166,6 +166,10 @@ export default {
     if (request.method === "GET" && url.pathname === "/health") {
       return Response.json({ status: "ok" });
     }
+
+    if (request.method !== "POST") {
+      return new Response("Method Not Allowed", { status: 405 });
+    }
     if (request.method !== "POST") {
       return new Response("Method Not Allowed", { status: 405 });
     }
