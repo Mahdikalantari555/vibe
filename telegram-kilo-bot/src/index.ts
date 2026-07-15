@@ -72,9 +72,7 @@ async function generateTeaching(apiKey: string, seed: string): Promise<string> {
       const data: any = await res.json();
       const choice = data?.choices?.[0];
       const content = (choice?.message?.content ?? "").trim();
-      const reasoning = (choice?.message?.reasoning ?? "").trim();
-      const text = content || reasoning;
-      const cleaned = sanitizePersian(text);
+      const cleaned = sanitizePersian(content);
       if (cleaned) return cleaned;
       throw new Error("empty content");
     } catch (e) {
@@ -87,6 +85,7 @@ async function generateTeaching(apiKey: string, seed: string): Promise<string> {
 
 function sanitizePersian(text: string): string {
   return text
+    .replace(/<think>[\s\S]*?<\/think>/gi, "")
     .replace(/[A-Za-zÀ-ɏЀ-ӿ一-鿿぀-ヿ가-힯]/g, "")
     .replace(/[ \t]{2,}/g, " ")
     .replace(/\n{3,}/g, "\n\n")
