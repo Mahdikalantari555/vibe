@@ -1,0 +1,20 @@
+{
+  "name": "telegram-kilo-bot",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-01-01",
+  "vars": {
+    "CHANNEL_ID": ""
+  },
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "REPLACE_WITH_YOUR_KV_ID"
+    }
+  ],
+  "triggers": {
+    "crons": ["41 19 * * *"]
+  },
+  "observability": {
+    "enabled": true
+  }
+}
