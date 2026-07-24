@@ -2,9 +2,7 @@ import { Env } from "./telegram";
 import { chatWithLlm } from "./openrouter";
 import { addConversation, getConversations, getMemories, getOrCreateUser } from "./memory/d1";
 import { extractFacts } from "./planner";
-import { plan, executeTool, buildSystemPrompt } from "./executor";
-import { searchTool, weatherTool, calculatorTool, githubTool } from "./tools";
-import type { Tool } from "./executor";
+import { plan, executeTool, buildSystemPrompt, TOOLS } from "./executor";
 
 export interface AgentRequest {
   env: Env;
@@ -34,14 +32,12 @@ export async function handleAgentRequest(req: AgentRequest): Promise<string> {
     { role: "user" as const, content: text },
   ];
 
-  const tools: Tool[] = [searchTool, weatherTool, calculatorTool, githubTool];
-
   const maxLoops = 3;
   let currentMessages = messages;
   let finalResponse = "";
 
   for (let i = 0; i < maxLoops; i++) {
-    const result = await plan(env, currentMessages, tools);
+    const result = await plan(env, currentMessages, TOOLS);
 
     if (result.toolCalls && result.toolCalls.length > 0) {
       for (const tc of result.toolCalls) {

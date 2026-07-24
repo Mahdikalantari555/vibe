@@ -12,6 +12,86 @@ export interface Tool {
   execute(input: any): Promise<any>;
 }
 
+const TOOLS: Tool[] = [
+  {
+    name: "search",
+    description: "Search the web for current information.",
+    inputSchema: {
+      type: "object",
+      properties: { query: { type: "string", description: "Search query" } },
+      required: ["query"],
+    },
+    async execute(input: { query: string }) {
+      return { tool: "search", result: `[search result for: ${input.query}]` };
+    },
+  },
+  {
+    name: "weather",
+    description: "Get current weather for a city.",
+    inputSchema: {
+      type: "object",
+      properties: { city: { type: "string", description: "City name" } },
+      required: ["city"],
+    },
+    async execute(input: { city: string }) {
+      return { tool: "weather", result: `Weather for ${input.city}: Add a weather API here.` };
+    },
+  },
+  {
+    name: "calculator",
+    description: "Evaluate a math expression.",
+    inputSchema: {
+      type: "object",
+      properties: { expression: { type: "string", description: "Math expression, e.g. 2 * (3 + 4)" } },
+      required: ["expression"],
+    },
+    async execute(input: { expression: string }) {
+      try {
+        const result = Function('"use strict"; return (' + input.expression + ')')();
+        return { tool: "calculator", result: String(result) };
+      } catch (e) {
+        return { tool: "calculator", error: (e as Error).message };
+      }
+    },
+  },
+  {
+    name: "github",
+    description: "Fetch information from GitHub: user, repo, or commits.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        action: { type: "string", enum: ["user", "repo", "commits"] },
+        owner: { type: "string", description: "GitHub owner/login" },
+        repo: { type: "string", description: "Repository name" },
+      },
+      required: ["action", "owner"],
+    },
+    async execute(input: any) {
+      let url = "";
+      if (input.action === "user") {
+        url = `https://api.github.com/users/${input.owner}`;
+      } else if (input.action === "repo") {
+        if (!input.repo) return { tool: "github", error: "repo is required" };
+        url = `https://api.github.com/repos/${input.owner}/${input.repo}`;
+      } else if (input.action === "commits") {
+        if (!input.repo) return { tool: "github", error: "repo is required" };
+        url = `https://api.github.com/repos/${input.owner}/${input.repo}/commits`;
+      } else {
+        return { tool: "github", error: "Unknown action" };
+      }
+
+      const r = await fetch(url);
+      if (!r.ok) return { tool: "github", error: `HTTP ${r.status}` };
+      const data = await r.json();
+      return { tool: "github", result: data };
+    },
+  },
+];
+
+const TOOL_MAP = new Map(
+  TOOLS.map((t) => [t.name, t] as const)
+);
+
 export async function plan(
   env: Env,
   messages: LlmMessage[],
@@ -69,16 +149,9 @@ export async function plan(
 }
 
 export async function executeTool(env: Env, toolName: string, args: any): Promise<any> {
-  const toolMap: Record<string, (args: any) => Promise<any>> = {
-    search: async (a: any) => (await import("../tools/search")).searchTool.execute(a),
-    weather: async (a: any) => (await import("../tools/weather")).weatherTool.execute(a),
-    calculator: async (a: any) => (await import("../tools/calculator")).calculatorTool.execute(a),
-    github: async (a: any) => (await import("../tools/github")).githubTool.execute(a),
-  };
-
-  const fn = toolMap[toolName];
-  if (!fn) return { error: `Unknown tool: ${toolName}` };
-  return fn(args);
+  const tool = TOOL_MAP.get(toolName);
+  if (!tool) return { error: `Unknown tool: ${toolName}` };
+  return tool.execute(args);
 }
 
 export function buildSystemPrompt(memories: string[], systemPrompt?: string): string {
@@ -86,3 +159,5 @@ export function buildSystemPrompt(memories: string[], systemPrompt?: string): st
   if (!memories.length) return base;
   return `${base}\n\nKnown facts about the user:\n${memories.map((m, i) => `${i + 1}. ${m}`).join("\n")}`;
 }
+
+export { TOOLS };

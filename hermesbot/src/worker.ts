@@ -1,3 +1,9 @@
+import { Env } from "./telegram";
+import { handleAgentRequest } from "./agent";
+import { AgentDO } from "./memory/durable";
+
+export { AgentDO };
+
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);

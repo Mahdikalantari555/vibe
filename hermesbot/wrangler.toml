@@ -18,12 +18,12 @@ LLM_BASE_URL = "https://api.kilo.ai/api/gateway"
 
 [[kv_namespaces]]
 binding = "KV"
-id = "REPLACE_WITH_KV_ID"
+id = "bda09a6ea64b4f6eb4192042b0978ebf"
 
 [[d1_databases]]
 binding = "D1"
 database_name = "hermesbot"
-id = "REPLACE_WITH_D1_ID"
+id = "283f7041-0a54-4d6e-b4e3-6e73178a8be3"
 
 [[durable_objects.bindings]]
 name = "AGENT"
@@ -31,7 +31,7 @@ class_name = "AgentDO"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["AgentDO"]
+new_sqlite_classes = ["AgentDO"]
 
 [observability]
 enabled = true
