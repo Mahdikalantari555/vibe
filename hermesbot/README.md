@@ -32,7 +32,7 @@ npm install
 
 # Set secrets
 npx wrangler secret put TELEGRAM_BOT_TOKEN
-npx wrangler secret put OPENROUTER_API_KEY
+npx wrangler secret put LLM_API_KEY
 
 # Deploy
 npx wrangler deploy
