@@ -1,0 +1,4 @@
+name = "hermesbot"
+main = "src/worker.ts"
+compatibility_date = "2024-09-23"
+account_id = "aaf44754df516b2e1d9e5cb983cd8569"
