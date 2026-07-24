@@ -36,18 +36,18 @@ export async function plan(
     body.tool_choice = "auto";
   }
 
-  const r = await fetch(`${env.OPENROUTER_BASE_URL}/chat/completions`, {
+  const r = await fetch(`${env.LLM_BASE_URL}/chat/completions`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      authorization: `Bearer ${env.OPENROUTER_API_KEY}`,
+      authorization: `Bearer ${env.LLM_API_KEY}`,
     },
     body: JSON.stringify(body),
   });
 
   if (!r.ok) {
     const text = await r.text();
-    throw new Error(`OpenRouter ${r.status}: ${text}`);
+    throw new Error(`LLM ${r.status}: ${text}`);
   }
 
   const data: any = await r.json();

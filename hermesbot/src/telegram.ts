@@ -1,7 +1,7 @@
 export interface Env {
   TELEGRAM_BOT_TOKEN: string;
-  OPENROUTER_API_KEY: string;
-  OPENROUTER_BASE_URL: string;
+  LLM_API_KEY: string;
+  LLM_BASE_URL: string;
   SYSTEM_PROMPT: string;
   MODEL: string;
   KV: KVNamespace;

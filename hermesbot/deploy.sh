@@ -82,7 +82,7 @@ CREATE INDEX IF NOT EXISTS idx_memories_user ON memories(user_id, key);
 SQL
 
 printf '%s' "$BOT_TOKEN" | npx wrangler secret put TELEGRAM_BOT_TOKEN
-printf '%s' "$OPENROUTER_API_KEY" | npx wrangler secret put OPENROUTER_API_KEY
+printf '%s' "$OPENROUTER_API_KEY" | npx wrangler secret put LLM_API_KEY
 
 DEPLOY_OUT=$(npx wrangler deploy 2>&1)
 echo "$DEPLOY_OUT"
