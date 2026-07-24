@@ -16,9 +16,14 @@ Rules:
 MODEL = "openai/gpt-oss-20b"
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
-[nobs]
-KV = { binding = "KV", id = "REPLACE_WITH_KV_ID" }
-D1 = { binding = "D1", id = "REPLACE_WITH_D1_ID" }
+[[kv_namespaces]]
+binding = "KV"
+id = "REPLACE_WITH_KV_ID"
+
+[[d1_databases]]
+binding = "D1"
+database_name = "hermesbot"
+id = "REPLACE_WITH_D1_ID"
 
 [[durable_objects.bindings]]
 name = "AGENT"
