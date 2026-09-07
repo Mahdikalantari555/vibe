@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Downloads</title>
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+  }
+  h1 { margin-bottom: 20px; }
+  #start-all {
+    padding: 12px 30px;
+    font-size: 16px;
+    background: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 30px;
+  }
+  #start-all:hover { background: #106ebe; }
+  .links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 60%;
+    max-width: 700px;
+  }
+  a {
+    display: block;
+    padding: 10px 16px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #0056b3;
+    text-align: center;
+    transition: background 0.2s;
+  }
+  a:hover { background: #eef5ff; }
+</style>
+</head>
+<body>
+  <h1>Downloads</h1>
+  <button id="start-all">Start All Downloads</button>
+  <div class="links" id="links"></div>
+
+<script>
+  const links = [
+    // Landsat data 2013-2026
+    "https://huggingface.co/datasets/mahdi555/landsat_data/resolve/main/2013.zip?download=true",
+    "https://huggingface.co/datasets/mahdi555/landsat_data/resolve/main/2014.zip?download=true",
+    "https://huggingface.co/datasets/mahdi555/landsat_data/resolve/main/2015.zip?download=true",
+    "https://huggingface.co/datasets/mahdi555/landsat_data/resolve/main/2016.zip?download=true",
+    "https://huggingface.co/datasets/mahdi555/landsat_data/resolve/main/2017.zip?download=true",
+    "https://huggingface.co/datasets/mahdi555/landsat_data/resolve/main/2018.zip?download=true",
+    "https://huggingface.co/datasets/mahdi555/landsat_data/resolve/main/2019.zip?download=true",
+    "https://huggingface.co/datasets/mahdi555/landsat_data/resolve/main/2020.zip?download=true",
+    "https://huggingface.co/datasets/mahdi555/landsat_data/resolve/main/2021.zip?download=true",
+    "https://huggingface.co/datasets/mahdi555/landsat_data/resolve/main/2022.zip?download=true",
+    "https://huggingface.co/datasets/mahdi555/landsat_data/resolve/main/2023.zip?download=true",
+    "https://huggingface.co/datasets/mahdi555/landsat_data/resolve/main/2024.zip?download=true",
+    "https://huggingface.co/datasets/mahdi555/landsat_data/resolve/main/2025.zip?download=true",
+    "https://huggingface.co/datasets/mahdi555/landsat_data/resolve/main/2026.zip?download=true",
+    // QGIS
+    "https://download.qgis.org/downloads/QGIS-OSGeo4W-3.44.14-1.msi",
+    // Zotero
+    "https://www.zotero.org/download/client/dl?channel=release&platform=win-x64",
+    // Obsidian
+    "https://github.com/obsidianmd/obsidian-releases/download/v1.13.7/Obsidian-1.13.7.exe",
+    // ArcGIS
+    "https://dl2.soft98.ir/engineering/ESRI.ArcGIS.Pro.3.7.0.rar?1788791758",
+    // MiKTeX
+    "https://miktex.org/download/ctan/systems/win32/miktex/setup/windows-x64/basic-miktex-25.12-x64.exe"
+  ];
+
+  const container = document.getElementById('links');
+  links.forEach(url => {
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.textContent = url.length > 70 ? url.substring(0, 67) + '...' : url;
+    container.appendChild(a);
+  });
+
+  document.getElementById('start-all').addEventListener('click', () => {
+    links.forEach(url => {
+      window.open(url, '_blank');
+    });
+  });
+</script>
+</body>
+</html>
