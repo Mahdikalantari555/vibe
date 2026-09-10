@@ -215,6 +215,18 @@ export default {
         "🌿 سلام\nهر شب ساعت ۱۱:۱۱ یک آموزهٔ زرتشتی برایت می‌فرستم. هر وقت خواستی آموزهٔ تازه‌ای ببین، دکمهٔ زیر را بزن.";
       const prompt = "برای دریافت یک آموزهٔ تازه، دکمهٔ زیر را بزن:";
 
+      if (text === "/more_teaching") {
+        try {
+          const teaching = await generateTeaching(env.KILO_API_KEY, randomSeed());
+          await sendLong(env.BOT_TOKEN, chatId, teaching);
+        } catch {
+          try {
+            await sendLong(env.BOT_TOKEN, chatId, "متاسفم، الان نتونستم آموزه بسازم. دوباره امتحان کن.");
+          } catch {}
+        }
+        return new Response("OK");
+      }
+
       try {
         await tg(env.BOT_TOKEN, "sendMessage", {
           chat_id: chatId,
