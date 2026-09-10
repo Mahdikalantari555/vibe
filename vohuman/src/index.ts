@@ -48,7 +48,7 @@ async function generateTeaching(apiKey: string, seed: string): Promise<string> {
   let lastErr: any;
   for (let attempt = 1; attempt <= 4; attempt++) {
     const model = models[(attempt - 1) % models.length];
-    const maxTokens = attempt <= 2 ? 1500 : 2500;
+    const maxTokens = attempt <= 2 ? 2500 : 5000;
     try {
       const res = await fetch(`${KILO_BASE_URL}/chat/completions`, {
         method: "POST",
