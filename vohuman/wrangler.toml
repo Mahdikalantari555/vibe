@@ -1,0 +1,15 @@
+name = "vohuman"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+account_id = "b11d63e1f0e7a702a47f2c3d8d7e4ea5"
+
+[vars]
+MODEL = "kilo-auto/free"
+LLM_BASE_URL = "https://api.kilo.ai/api/gateway"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "287c947129fb41adae7c0afb94c16cbd"
+
+[observability]
+enabled = true

@@ -81,6 +81,7 @@ export default {
   async scheduled(event: any, env: Env, ctx: ExecutionContext): Promise<void> {
     ctx.waitUntil((async () => {
       try {
+        if (!env.KV) return;
         const subsRaw = await env.KV.get("agent:subscribers");
         const subscribers: number[] = subsRaw ? JSON.parse(subsRaw) : [];
         const greeting = "🌿 سلام! هرمس اینجاست. امروز چطور می‌تونم کمکت کنم؟";

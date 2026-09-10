@@ -4,7 +4,7 @@ export interface Env {
   LLM_BASE_URL: string;
   SYSTEM_PROMPT: string;
   MODEL: string;
-  KV: KVNamespace;
+  KV?: KVNamespace;
   D1: D1Database;
   AGENT: DurableObjectNamespace;
 }
@@ -50,19 +50,23 @@ export function getUserKey(chatId: number, suffix: string): string {
 }
 
 export async function getUserProfile(env: Env, chatId: number): Promise<any> {
+  if (!env.KV) return null;
   const raw = await env.KV.get(getUserKey(chatId, "profile"));
   return raw ? JSON.parse(raw) : null;
 }
 
 export async function setUserProfile(env: Env, chatId: number, profile: any): Promise<void> {
+  if (!env.KV) return;
   await env.KV.put(getUserKey(chatId, "profile"), JSON.stringify(profile));
 }
 
 export async function getGlobalConfig(env: Env): Promise<any> {
+  if (!env.KV) return null;
   const raw = await env.KV.get("agent:global:config");
   return raw ? JSON.parse(raw) : null;
 }
 
 export async function setGlobalConfig(env: Env, config: any): Promise<void> {
+  if (!env.KV) return;
   await env.KV.put("agent:global:config", JSON.stringify(config));
 }

@@ -1,0 +1,21 @@
+{
+  "name": "telegram-kilo-bot",
+  "main": "src/index.ts",
+  "account_id": "b11d63e1f0e7a702a47f2c3d8d7e4ea5",
+  "compatibility_date": "2025-01-01",
+  "vars": {
+    "CHANNEL_ID": "@hamewahman"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "ed4e910c294d4f69870cd17305017879"
+    }
+  ],
+  "triggers": {
+    "crons": ["41 19 * * *"]
+  },
+  "observability": {
+    "enabled": true
+  }
+}
