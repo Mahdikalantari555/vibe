@@ -25,10 +25,9 @@ const telegramApi = (token: string, method: string) =>
   `https://api.telegram.org/bot${token}/${method}`;
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
-    // تنظیم webhook (فقط یکبار): GET /setup?url=https://...
     if (request.method === "GET" && url.pathname === "/setup") {
       const hook = url.searchParams.get("url");
       if (!hook) return new Response("?url= missing", { status: 400 });
@@ -54,28 +53,32 @@ export default {
     const msg = update.message;
     if (!msg || !msg.text) return new Response("ok");
 
-    try {
-      const reply = await chatWithLlm(env, msg.text);
-      await fetch(telegramApi(env.TELEGRAM_BOT_TOKEN, "sendMessage"), {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          chat_id: msg.chat.id,
-          text: reply,
-          reply_to_message_id: msg.message_id,
-        }),
-      });
-    } catch (e) {
-      const err = e instanceof Error ? e.message : String(e);
-      await fetch(telegramApi(env.TELEGRAM_BOT_TOKEN, "sendMessage"), {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          chat_id: msg.chat.id,
-          text: `⚠️ Error: ${err}`,
-        }),
-      });
-    }
+    ctx.waitUntil(
+      (async () => {
+        try {
+          const reply = await chatWithLlm(env, msg.text);
+          await fetch(telegramApi(env.TELEGRAM_BOT_TOKEN, "sendMessage"), {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              chat_id: msg.chat.id,
+              text: reply,
+              reply_to_message_id: msg.message_id,
+            }),
+          });
+        } catch (e) {
+          const err = e instanceof Error ? e.message : String(e);
+          await fetch(telegramApi(env.TELEGRAM_BOT_TOKEN, "sendMessage"), {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              chat_id: msg.chat.id,
+              text: `⚠️ Error: ${err}`,
+            }),
+          });
+        }
+      })()
+    );
 
     return new Response("ok");
   },
