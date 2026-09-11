@@ -48,6 +48,7 @@ async function generateTeaching(apiKey: string, seed: string): Promise<string> {
   let lastErr: any;
   for (let attempt = 1; attempt <= 4; attempt++) {
     const model = models[(attempt - 1) % models.length];
+    const maxTokens = attempt <= 2 ? 1500 : 2500;
     try {
       const res = await fetch(`${KILO_BASE_URL}/chat/completions`, {
         method: "POST",
@@ -58,9 +59,8 @@ async function generateTeaching(apiKey: string, seed: string): Promise<string> {
         body: JSON.stringify({
           model,
           messages,
-          max_tokens: 500,
+          max_tokens: maxTokens,
           temperature: 0.9,
-          reasoning_effort: "none",
         }),
       });
 
