@@ -1,7 +1,24 @@
+import re
+
 import httpx
 import os
 from typing import AsyncGenerator, Optional
 import json
+
+
+def strip_reasoning(text: str) -> str:
+    text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r"<thinking>.*?</thinking>", "", text, flags=re.DOTALL | re.IGNORECASE)
+    lines = text.splitlines()
+    cleaned = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("**Reasoning:**") or stripped.startswith("**Answer:**"):
+            continue
+        cleaned.append(line)
+    text = "\n".join(cleaned)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
 
 
 class HermesGatewayClient:
@@ -39,7 +56,7 @@ class HermesGatewayClient:
                                 delta = chunk["choices"][0].get("delta", {})
                                 content = delta.get("content", "")
                                 if content:
-                                    yield content
+                                    yield strip_reasoning(content)
                         except json.JSONDecodeError:
                             continue
 
@@ -47,4 +64,4 @@ class HermesGatewayClient:
         chunks = []
         async for chunk in self.chat_stream(messages):
             chunks.append(chunk)
-        return "".join(chunks)
+        return strip_reasoning("".join(chunks))
