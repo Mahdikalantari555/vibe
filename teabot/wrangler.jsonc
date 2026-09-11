@@ -1,5 +1,5 @@
 {
-  "name": "telegram-llm-bot",
+  "name": "teabot",
   "main": "src/index.ts",
   "compatibility_date": "2024-09-23",
   "account_id": "b11d63e1f0e7a702a47f2c3d8d7e4ea5",

@@ -104,8 +104,8 @@ async function chatWithLlm(env: Env, userText: string): Promise<string> {
     throw new Error(`LLM ${r.status}: ${await r.text()}`);
   }
 
-  const data = await r.json<{ choices: { message: { content: string } }[] }>();
-  const content = data.choices[0]?.message?.content ?? "(empty response)";
+  const data: any = await r.json();
+  const content = data?.choices?.[0]?.message?.content ?? "(empty response)";
   return cleanResponse(content);
 }
 
