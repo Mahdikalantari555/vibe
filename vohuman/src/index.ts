@@ -164,7 +164,7 @@ async function runNightlyBroadcast(env: Env): Promise<void> {
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
     if (request.method === "GET" && url.pathname === "/health") {
@@ -182,23 +182,23 @@ export default {
       return new Response("Bad Request", { status: 400 });
     }
 
-    try {
     const cb = update?.callback_query;
     if (cb) {
       const chatId = cb.message?.chat?.id ?? cb.from?.id;
-      try {
-        await tg(env.BOT_TOKEN, "answerCallbackQuery", { callback_query_id: cb.id });
-      } catch (e) {
-        console.error("answerCallbackQuery failed", e);
-      }
-      try {
-        const teaching = await generateTeaching(env.KILO_API_KEY, randomSeed());
-        await sendLong(env.BOT_TOKEN, chatId, teaching);
-      } catch {
-        try {
-          await sendLong(env.BOT_TOKEN, chatId, "متاسفم، الان نتونستم آموزه بسازم. دوباره امتحان کن.");
-        } catch {}
-      }
+      ctx.waitUntil(
+        (async () => {
+          try {
+            await tg(env.BOT_TOKEN, "answerCallbackQuery", { callback_query_id: cb.id });
+            const teaching = await generateTeaching(env.KILO_API_KEY, randomSeed());
+            await sendLong(env.BOT_TOKEN, chatId, teaching);
+          } catch (e) {
+            console.error("callback handling failed", e);
+            try {
+              await sendLong(env.BOT_TOKEN, chatId, "متاسفم، الان نتونستم آموزه بسازم. دوباره امتحان کن.");
+            } catch {}
+          }
+        })()
+      );
       return new Response("OK");
     }
 
@@ -207,7 +207,9 @@ export default {
       const chatId: number = msg.chat.id;
 
       if (msg.chat.type === "private") {
-        await addSubscriber(env.KV, chatId);
+        ctx.waitUntil(
+          addSubscriber(env.KV, chatId).catch((e) => console.error("addSubscriber failed", e))
+        );
       }
 
       const text: string = msg.text ?? "";
@@ -216,34 +218,32 @@ export default {
       const prompt = "برای دریافت یک آموزهٔ تازه، دکمهٔ زیر را بزن:";
 
       if (text === "/more_teaching") {
-        try {
-          const teaching = await generateTeaching(env.KILO_API_KEY, randomSeed());
-          await sendLong(env.BOT_TOKEN, chatId, teaching);
-        } catch {
-          try {
-            await sendLong(env.BOT_TOKEN, chatId, "متاسفم، الان نتونستم آموزه بسازم. دوباره امتحان کن.");
-          } catch {}
-        }
+        ctx.waitUntil(
+          (async () => {
+            try {
+              const teaching = await generateTeaching(env.KILO_API_KEY, randomSeed());
+              await sendLong(env.BOT_TOKEN, chatId, teaching);
+            } catch {
+              try {
+                await sendLong(env.BOT_TOKEN, chatId, "متاسفم، الان نتونستم آموزه بسازم. دوباره امتحان کن.");
+              } catch {}
+            }
+          })()
+        );
         return new Response("OK");
       }
 
-      try {
-        await tg(env.BOT_TOKEN, "sendMessage", {
+      ctx.waitUntil(
+        tg(env.BOT_TOKEN, "sendMessage", {
           chat_id: chatId,
           text: text === "/start" || text === "/help" || text === "" ? welcome : prompt,
           reply_markup: NEW_TEACHING_MARKUP,
-        });
-      } catch (e) {
-        console.error("welcome send failed", e);
-      }
+        }).catch((e) => console.error("welcome send failed", e))
+      );
       return new Response("OK");
     }
 
     return new Response("OK");
-    } catch (err: any) {
-      console.error("unhandled error", err);
-      return new Response("OK");
-    }
   },
 
   async scheduled(_event: any, env: Env, _ctx: any): Promise<void> {
